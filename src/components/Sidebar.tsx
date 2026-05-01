@@ -18,7 +18,7 @@ const items = [
 
 export default function Sidebar({ activeView, onNavigate, profile }: SidebarProps) {
   return (
-    <aside className="border-b border-stone-200 bg-white lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
+    <aside className="border-b border-stone-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:self-start lg:border-b-0 lg:border-r">
       <div className="flex h-full flex-col gap-6 p-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-forest">Discipline Desk</p>
