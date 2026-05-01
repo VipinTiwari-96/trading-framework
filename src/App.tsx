@@ -1,19 +1,22 @@
 import React from 'react';
 import Journal from './components/Journal';
+import ProfileGate from './components/ProfileGate';
+import ReminderBanner from './components/ReminderBanner';
 import RuleBook from './components/RuleBook';
 import Sidebar, { View } from './components/Sidebar';
 import Stats from './components/Stats';
 import TradeForm from './components/TradeForm';
 import { defaultRules } from './data/defaults';
-import { Trade, TradingRule } from './types';
+import { Trade, TradingRule, UserProfile } from './types';
 import { compressScreenshotDataUrl } from './utils/image';
-import { loadJournalData, saveRulesToDb, saveTradesToDb } from './utils/storage';
+import { loadJournalData, loadProfile, saveProfile, saveRulesToDb, saveTradesToDb } from './utils/storage';
 
 export default function App() {
   const [activeView, setActiveView] = React.useState<View>('stats');
   const [rules, setRules] = React.useState<TradingRule[]>(defaultRules);
   const [trades, setTrades] = React.useState<Trade[]>([]);
   const [editingTrade, setEditingTrade] = React.useState<Trade | null>(null);
+  const [profile, setProfile] = React.useState<UserProfile | null>(() => loadProfile());
   const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
@@ -61,6 +64,11 @@ export default function App() {
   const navigate = (view: View) => {
     setEditingTrade(null);
     setActiveView(view);
+  };
+
+  const updateProfile = (nextProfile: UserProfile) => {
+    setProfile(nextProfile);
+    saveProfile(nextProfile);
   };
 
   const exportBackup = () => {
@@ -131,11 +139,16 @@ export default function App() {
     window.alert(optimizedCount ? `Optimized ${optimizedCount} screenshot(s).` : 'Screenshots are already optimized.');
   };
 
+  if (!profile) {
+    return <ProfileGate onSave={updateProfile} />;
+  }
+
   return (
     <div className="min-h-screen bg-paper text-ink lg:flex">
-      <Sidebar activeView={activeView} onNavigate={navigate} />
+      <Sidebar activeView={activeView} onNavigate={navigate} profile={profile} />
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
+          {loaded && <ReminderBanner name={profile.name} />}
           {!loaded && <div className="panel p-8 text-center font-semibold text-stone-600">Loading journal...</div>}
           {loaded && activeView === 'rules' && <RuleBook rules={rules} onChange={setRules} />}
           {loaded && activeView === 'add' && (

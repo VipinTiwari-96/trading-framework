@@ -1,10 +1,12 @@
 import { BarChart3, BookOpen, ClipboardPenLine, ListChecks } from 'lucide-react';
+import { UserProfile } from '../types';
 
 export type View = 'rules' | 'add' | 'journal' | 'stats';
 
 interface SidebarProps {
   activeView: View;
   onNavigate: (view: View) => void;
+  profile: UserProfile;
 }
 
 const items = [
@@ -14,13 +16,14 @@ const items = [
   { view: 'stats' as const, label: 'Stats', icon: BarChart3 }
 ];
 
-export default function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export default function Sidebar({ activeView, onNavigate, profile }: SidebarProps) {
   return (
     <aside className="border-b border-stone-200 bg-white lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
       <div className="flex h-full flex-col gap-6 p-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-forest">Discipline Desk</p>
           <h1 className="mt-1 text-xl font-bold text-ink">Trading Journal</h1>
+          <p className="mt-2 text-sm font-semibold text-stone-500">Trader: {profile.name}</p>
         </div>
         <nav className="grid grid-cols-2 gap-2 lg:grid-cols-1">
           {items.map((item) => {

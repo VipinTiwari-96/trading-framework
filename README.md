@@ -12,6 +12,8 @@ npm run dev
 ## What is included
 
 - Editable rule book grouped by category.
+- First-run trader profile with personal greeting.
+- Rotating trading discipline reminders.
 - Structured trade form with pre-trade checklist and post-trade review.
 - Discipline scoring, invalid trade warnings, and consecutive violation alert.
 - Rule Book confirmations that feed required rules into the discipline score.

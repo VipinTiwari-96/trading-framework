@@ -1,8 +1,9 @@
-import { StorageReport, Trade, TradingRule } from '../types';
+import { StorageReport, Trade, TradingRule, UserProfile } from '../types';
 import { defaultRules } from '../data/defaults';
 
 const TRADES_KEY = 'disciplineJournal.trades';
 const RULES_KEY = 'disciplineJournal.rules';
+const PROFILE_KEY = 'disciplineJournal.profile';
 const DB_NAME = 'disciplineJournalDb';
 const DB_VERSION = 1;
 const STORE_NAME = 'journal';
@@ -25,6 +26,12 @@ export const saveTrades = (trades: Trade[]) => {
 
 export const saveRules = (rules: TradingRule[]) => {
   localStorage.setItem(RULES_KEY, JSON.stringify(rules));
+};
+
+export const loadProfile = (): UserProfile | null => read<UserProfile | null>(PROFILE_KEY, null);
+
+export const saveProfile = (profile: UserProfile) => {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 };
 
 const openDatabase = () =>

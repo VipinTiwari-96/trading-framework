@@ -81,3 +81,8 @@ export interface StorageReport {
   estimatedCapacity: number;
   estimatedRemainingEntries: number;
 }
+
+export interface UserProfile {
+  name: string;
+  createdAt: string;
+}
