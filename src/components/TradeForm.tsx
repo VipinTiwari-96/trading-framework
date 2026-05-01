@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, ImagePlus, Save } from 'lucide-react';
 import { mistakeTags } from '../data/defaults';
 import { evaluateTrade, getConsecutiveInvalidTrades } from '../utils/discipline';
+import { compressScreenshot } from '../utils/image';
 import { EmotionalState, Trade, TradeDraft, TradeResult, TradingRule, TradingSession, Trend } from '../types';
 
 interface TradeFormProps {
@@ -55,6 +56,7 @@ const emotionalStates: EmotionalState[] = ['Calm', 'Excited', 'Fearful', 'Reveng
 
 export default function TradeForm({ trades, rules, editingTrade, onSave, onCancelEdit }: TradeFormProps) {
   const [draft, setDraft] = React.useState<TradeDraft>(() => (editingTrade ? draftFromTrade(editingTrade) : initialDraft()));
+  const [screenshotStatus, setScreenshotStatus] = React.useState('');
   const evaluation = evaluateTrade(draft, rules);
   const consecutiveInvalid = getConsecutiveInvalidTrades(trades);
 
@@ -73,11 +75,16 @@ export default function TradeForm({ trades, rules, editingTrade, onSave, onCance
     setDraft({ ...draft, mistakes });
   };
 
-  const handleScreenshot = (file?: File) => {
+  const handleScreenshot = async (file?: File) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setDraft({ ...draft, screenshot: String(reader.result) });
-    reader.readAsDataURL(file);
+    setScreenshotStatus('Compressing screenshot...');
+    try {
+      const screenshot = await compressScreenshot(file);
+      setDraft((current) => ({ ...current, screenshot }));
+      setScreenshotStatus('Screenshot compressed and attached');
+    } catch {
+      setScreenshotStatus('Could not attach screenshot');
+    }
   };
 
   const submit = (event: React.FormEvent) => {
@@ -216,6 +223,7 @@ export default function TradeForm({ trades, rules, editingTrade, onSave, onCance
               Screenshot
               <input className="hidden" type="file" accept="image/*" onChange={(event) => handleScreenshot(event.target.files?.[0])} />
             </label>
+            {screenshotStatus && <p className="mt-2 text-sm font-semibold text-stone-500">{screenshotStatus}</p>}
           </div>
         </div>
 

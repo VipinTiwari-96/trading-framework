@@ -20,4 +20,7 @@ npm run dev
 - Trade journal with filters for date, pair, and result.
 - Analytics dashboard with win rate, average risk, rule-following percentage, invalid trades, and daily summary.
 - Optional mistake tags and screenshot upload.
-- localStorage persistence.
+- Automatic screenshot compression to reduce storage usage.
+- One-click screenshot optimization for existing saved trades.
+- JSON export/import backup from the Stats page.
+- IndexedDB persistence for larger offline storage, with automatic migration from older localStorage data.

@@ -1,17 +1,31 @@
 import React from 'react';
-import { AlertTriangle, BarChart3, CheckCircle2, Database, Percent, Target, Wallet } from 'lucide-react';
+import { AlertTriangle, BarChart3, CheckCircle2, Database, Download, ImageDown, Percent, Target, Upload, Wallet } from 'lucide-react';
 import { getAnalytics } from '../utils/discipline';
 import { formatBytes, getStorageReport } from '../utils/storage';
 import { Trade } from '../types';
 
 interface StatsProps {
   trades: Trade[];
+  onExportBackup: () => void;
+  onImportBackup: (file: File) => void;
+  onOptimizeScreenshots: () => void;
 }
 
-export default function Stats({ trades }: StatsProps) {
+export default function Stats({ trades, onExportBackup, onImportBackup, onOptimizeScreenshots }: StatsProps) {
   const analytics = getAnalytics(trades);
-  const storage = getStorageReport(trades);
+  const [browserQuota, setBrowserQuota] = React.useState<number | undefined>();
+  const storage = getStorageReport(trades, browserQuota);
   const recent = trades.slice(0, 5);
+  const importInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (!navigator.storage?.estimate) return;
+    navigator.storage.estimate().then((estimate) => {
+      if (estimate.quota) {
+        setBrowserQuota(estimate.quota);
+      }
+    });
+  }, [trades]);
 
   return (
     <section className="space-y-5">
@@ -59,14 +73,41 @@ export default function Stats({ trades }: StatsProps) {
       </div>
 
       <div className="panel p-4">
-        <div className="mb-4 flex items-center gap-2 font-bold text-ink">
-          <Database size={18} />
-          Storage Estimate
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2 font-bold text-ink">
+            <Database size={18} />
+            Storage Estimate
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={onExportBackup} className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-3 py-2 text-sm font-bold text-stone-700">
+              <Download size={16} />
+              Export Backup
+            </button>
+            <button type="button" onClick={() => importInputRef.current?.click()} className="inline-flex items-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-bold text-white">
+              <Upload size={16} />
+              Import Backup
+            </button>
+            <button type="button" onClick={onOptimizeScreenshots} className="inline-flex items-center gap-2 rounded-md bg-forest px-3 py-2 text-sm font-bold text-white">
+              <ImageDown size={16} />
+              Optimize Screenshots
+            </button>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) onImportBackup(file);
+                event.currentTarget.value = '';
+              }}
+            />
+          </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <StorageStat label="Storage used" value={formatBytes(storage.tradeDataBytes)} />
           <StorageStat label="Storage remaining" value={formatBytes(storage.remainingBytes)} />
-          <StorageStat label="Storage limit" value={formatBytes(storage.storageLimitBytes)} />
+          <StorageStat label="Browser storage limit" value={formatBytes(storage.storageLimitBytes)} />
           <StorageStat label="Used percentage" value={`${storage.percentUsed}%`} />
           <StorageStat label="Screenshots inside trades" value={formatBytes(storage.screenshotBytes)} />
         </div>
@@ -79,7 +120,7 @@ export default function Stats({ trades }: StatsProps) {
           <StorageStat label="Estimated remaining entries" value={storage.estimatedRemainingEntries || '-'} />
         </div>
         <p className="mt-3 text-sm text-stone-500">
-          Estimate uses a typical 5 MB localStorage limit. Large screenshots are the main storage cost.
+          Storage now uses IndexedDB for a much larger offline journal. Browser limits vary by device and available disk space.
         </p>
       </div>
     </section>
