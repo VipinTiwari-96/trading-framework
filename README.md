@@ -1,0 +1,23 @@
+# Trading Discipline Journal
+
+A personal React + TypeScript trading journal and rule-book app focused on discipline, checklist compliance, and behavior tracking.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+## What is included
+
+- Editable rule book grouped by category.
+- Structured trade form with pre-trade checklist and post-trade review.
+- Discipline scoring, invalid trade warnings, and consecutive violation alert.
+- Rule Book confirmations that feed required rules into the discipline score.
+- Edit and delete actions for correcting journal entries.
+- Session and emotional-state tracking for each trade.
+- Trade journal with filters for date, pair, and result.
+- Analytics dashboard with win rate, average risk, rule-following percentage, invalid trades, and daily summary.
+- Optional mistake tags and screenshot upload.
+- localStorage persistence.
